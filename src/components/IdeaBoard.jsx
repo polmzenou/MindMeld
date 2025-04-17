@@ -47,7 +47,6 @@ function IdeaBoard() {
       setTimeLeft(prev => {
         const next = prev - 1
         if (next === 0) {
-          // 🔔 vibration ou son
           if ("vibrate" in navigator) navigator.vibrate(200)
           const audio = new Audio("https://www.myinstants.com/media/sounds/notification.mp3")
           audio.play().catch(() => {})
@@ -163,20 +162,20 @@ function IdeaBoard() {
   }
 
   return (
-    <div>
+    <div className="p-4 text-light-text dark:text-dark-text">
       <div className="flex items-center justify-between mb-4">
-        <div className="text-sm text-gray-600">
+        <div className="text-sm text-gray-700 dark:text-gray-300">
           ⏱️ Mode Focus : {focusMode ? formatTime(timeLeft) : 'inactif'}
           {focusMode && timeLeft === 0 && (
             <span className="ml-2 text-red-600 font-bold">🛎️ Temps écoulé !</span>
           )}
           {focusMode && (
-            <div className="text-xs text-gray-500">💡 Idées générées pendant le focus : {ideasDuringFocus}</div>
+            <div className="text-xs text-gray-500">💡 Idées générées : {ideasDuringFocus}</div>
           )}
         </div>
         <div className="flex items-center gap-2">
           <select
-            className="p-1 border rounded text-sm"
+            className="p-1 border rounded text-sm bg-white dark:bg-zinc-800 dark:text-white dark:border-gray-700"
             value={focusDuration}
             onChange={(e) => setFocusDuration(parseInt(e.target.value))}
             disabled={focusMode}
@@ -187,7 +186,7 @@ function IdeaBoard() {
           </select>
           <button
             onClick={toggleFocusMode}
-            className={`px-3 py-1 rounded text-white ${focusMode ? 'bg-red-600' : 'bg-green-600'}`}
+            className={`px-3 py-1 rounded text-white ${focusMode ? 'bg-red-600' : 'bg-light-accent dark:bg-dark-accent'}`}
           >
             {focusMode ? 'Arrêter le focus' : 'Démarrer'}
           </button>
@@ -200,11 +199,11 @@ function IdeaBoard() {
           value={newIdea}
           onChange={(e) => setNewIdea(e.target.value)}
           placeholder="Ajoute une idée..."
-          className="flex-1 p-2 border rounded"
+          className="flex-1 p-2 border rounded bg-white dark:bg-zinc-800 text-black dark:text-white border-gray-300 dark:border-gray-700"
         />
         <button
           onClick={() => addIdea()}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+          className="bg-light-accent dark:bg-dark-accent text-white px-4 py-2 rounded"
         >
           Ajouter
         </button>
@@ -216,7 +215,7 @@ function IdeaBoard() {
           {loading ? 'Chargement...' : '💡 Suggestion IA'}
         </button>
         <select
-          className="p-2 border rounded"
+          className="p-2 border rounded bg-white dark:bg-zinc-800 text-black dark:text-white border-gray-300 dark:border-gray-700"
           value={selectedModel}
           onChange={(e) => setSelectedModel(e.target.value)}
         >
@@ -228,7 +227,7 @@ function IdeaBoard() {
         </select>
       </div>
 
-      <div className="text-sm text-gray-600 mb-4">
+      <div className="text-sm text-gray-600 dark:text-gray-300 mb-4">
         🎯 Modèle utilisé : <strong>{MODELS.find(m => m.value === selectedModel)?.label}</strong>
         {lastResponseTime !== null && (
           <span> — ⏱️ Réponse en {lastResponseTime} ms</span>
@@ -248,11 +247,11 @@ function IdeaBoard() {
         )}
         <ul className="space-y-2 mt-2">
           {history.map((item) => (
-            <li key={item.id} className="bg-white shadow p-3 rounded flex justify-between items-center">
+            <li key={item.id} className="bg-white dark:bg-zinc-800 shadow p-3 rounded flex justify-between items-center text-black dark:text-white">
               <span className="text-sm">{item.text}</span>
               <button
                 onClick={() => setNewIdea(item.text)}
-                className="text-xs bg-blue-500 text-white px-2 py-1 rounded ml-2"
+                className="text-xs bg-light-accent dark:bg-dark-accent text-white px-2 py-1 rounded ml-2"
               >
                 📥 Réutiliser
               </button>
@@ -275,7 +274,7 @@ function IdeaBoard() {
       <div className="flex gap-2 mt-8">
         <button
           onClick={exportToMarkdown}
-          className="bg-gray-800 text-white px-4 py-2 rounded"
+          className="bg-light-accent dark:bg-dark-accent text-white px-4 py-2 rounded"
         >
           📤 Export Markdown
         </button>

@@ -50,20 +50,20 @@ function AssistantBot() {
   return (
     <div className="fixed bottom-4 right-4 z-50">
       {isOpen ? (
-        <div className="w-80 h-96 bg-white shadow-lg rounded-lg flex flex-col border border-gray-300">
-          <div className="p-3 border-b font-semibold flex justify-between items-center">
+        <div className="w-80 h-96 bg-light-card dark:bg-dark-card text-light-text dark:text-dark-text shadow-lg rounded-lg flex flex-col border border-gray-300 dark:border-zinc-700">
+          <div className="p-3 border-b border-gray-200 dark:border-zinc-700 font-semibold flex justify-between items-center">
             🤖 Assistant IA
             <div className="flex gap-2 items-center">
               <button
                 onClick={toggleMute}
-                className="text-sm text-gray-500 hover:text-black"
+                className="text-sm text-gray-500 dark:text-gray-300 hover:text-black dark:hover:text-white"
                 title={muted ? "Son désactivé" : "Son activé"}
               >
                 {muted ? '🔇' : '🔊'}
               </button>
               <button
                 onClick={clearHistory}
-                className="text-sm text-gray-500 hover:text-black"
+                className="text-sm text-gray-500 dark:text-gray-300 hover:text-black dark:hover:text-white"
                 title="Vider la conversation"
               >
                 🗑️
@@ -76,7 +76,7 @@ function AssistantBot() {
               <div
                 key={index}
                 className={`p-2 rounded-lg max-w-[90%] ${
-                  msg.role === 'user' ? 'bg-blue-100 self-end ml-auto' : 'bg-gray-100 self-start mr-auto'
+                  msg.role === 'user' ? 'bg-blue-100 dark:bg-blue-800 self-end ml-auto' : 'bg-gray-100 dark:bg-zinc-800 self-start mr-auto'
                 }`}
               >
                 {msg.content}
@@ -84,9 +84,9 @@ function AssistantBot() {
             ))}
             {loading && <div className="text-xs text-gray-400">L’IA répond...</div>}
           </div>
-          <div className="p-2 border-t flex items-center gap-2">
+          <div className="p-2 border-t border-gray-200 dark:border-zinc-700 flex items-center gap-2">
             <input
-              className="flex-1 border rounded px-2 py-1 text-sm"
+              className="flex-1 border rounded px-2 py-1 text-sm bg-white dark:bg-zinc-800 text-black dark:text-white border-gray-300 dark:border-zinc-700"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
@@ -95,7 +95,7 @@ function AssistantBot() {
             />
             <button
               onClick={handleSend}
-              className="bg-green-600 text-white px-3 py-1 rounded text-sm"
+              className="bg-light-accent dark:bg-dark-accent text-white px-3 py-1 rounded text-sm"
               disabled={loading}
             >
               Envoyer
@@ -105,7 +105,7 @@ function AssistantBot() {
       ) : (
         <button
           onClick={toggleBot}
-          className="bg-green-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-green-700"
+          className="bg-light-accent dark:bg-dark-accent text-white px-4 py-2 rounded-full shadow-lg hover:opacity-90"
         >
           🤖 Assistant
         </button>
