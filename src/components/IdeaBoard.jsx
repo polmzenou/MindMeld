@@ -24,6 +24,11 @@ function IdeaBoard() {
     return saved ? JSON.parse(saved) : []
   })
 
+  const [focusMode, setFocusMode] = useState(false)
+  const [timeLeft, setTimeLeft] = useState(15 * 60)
+  const [focusDuration, setFocusDuration] = useState(15 * 60)
+  const [ideasDuringFocus, setIdeasDuringFocus] = useState(0)
+
   useEffect(() => {
     const saved = localStorage.getItem('mindmeld_model')
     if (saved && MODELS.find(m => m.value === saved)) {
@@ -35,9 +40,45 @@ function IdeaBoard() {
     localStorage.setItem('mindmeld_model', selectedModel)
   }, [selectedModel])
 
+  useEffect(() => {
+    if (!focusMode || timeLeft <= 0) return
+
+    const interval = setInterval(() => {
+      setTimeLeft(prev => {
+        const next = prev - 1
+        if (next === 0) {
+          // 🔔 vibration ou son
+          if ("vibrate" in navigator) navigator.vibrate(200)
+          const audio = new Audio("https://www.myinstants.com/media/sounds/notification.mp3")
+          audio.play().catch(() => {})
+        }
+        return next
+      })
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [focusMode, timeLeft])
+
+  const toggleFocusMode = () => {
+    if (!focusMode) {
+      setTimeLeft(focusDuration)
+      setIdeasDuringFocus(0)
+      setFocusMode(true)
+    } else {
+      setFocusMode(false)
+    }
+  }
+
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0')
+    const s = (seconds % 60).toString().padStart(2, '0')
+    return `${m}:${s}`
+  }
+
   const addIdea = (text = newIdea) => {
     if (text.trim() === '') return
     setIdeas([...ideas, { id: Date.now(), text }])
+    if (focusMode) setIdeasDuringFocus(prev => prev + 1)
     setNewIdea('')
   }
 
@@ -123,6 +164,36 @@ function IdeaBoard() {
 
   return (
     <div>
+      <div className="flex items-center justify-between mb-4">
+        <div className="text-sm text-gray-600">
+          ⏱️ Mode Focus : {focusMode ? formatTime(timeLeft) : 'inactif'}
+          {focusMode && timeLeft === 0 && (
+            <span className="ml-2 text-red-600 font-bold">🛎️ Temps écoulé !</span>
+          )}
+          {focusMode && (
+            <div className="text-xs text-gray-500">💡 Idées générées pendant le focus : {ideasDuringFocus}</div>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          <select
+            className="p-1 border rounded text-sm"
+            value={focusDuration}
+            onChange={(e) => setFocusDuration(parseInt(e.target.value))}
+            disabled={focusMode}
+          >
+            <option value={5 * 60}>5 min</option>
+            <option value={15 * 60}>15 min</option>
+            <option value={25 * 60}>25 min</option>
+          </select>
+          <button
+            onClick={toggleFocusMode}
+            className={`px-3 py-1 rounded text-white ${focusMode ? 'bg-red-600' : 'bg-green-600'}`}
+          >
+            {focusMode ? 'Arrêter le focus' : 'Démarrer'}
+          </button>
+        </div>
+      </div>
+
       <div className="flex flex-wrap gap-2 mb-4 items-center">
         <input
           type="text"
@@ -139,8 +210,8 @@ function IdeaBoard() {
         </button>
         <button
           onClick={handleSuggestion}
-          className={`px-4 py-2 rounded text-white ${loading ? 'bg-gray-500' : 'bg-green-600'}`}
-          disabled={loading}
+          className={`px-4 py-2 rounded text-white ${loading || focusMode ? 'bg-gray-500' : 'bg-green-600'}`}
+          disabled={loading || focusMode}
         >
           {loading ? 'Chargement...' : '💡 Suggestion IA'}
         </button>

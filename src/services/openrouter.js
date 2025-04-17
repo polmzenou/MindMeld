@@ -24,6 +24,20 @@ const chatCompatibleModels = [
   "huggingfaceh4/zephyr-7b-beta:free"
 ]
 
+export const askAssistant = async (messages) => {
+  try {
+    const res = await openrouter.post('/chat/completions', {
+      model: 'mistralai/mistral-7b-instruct:free',
+      messages,
+      max_tokens: 200,
+      temperature: 0.7,
+    })
+    return res.data.choices[0].message.content
+  } catch (error) {
+    console.error('❌ Erreur assistant IA :', error)
+    throw new Error('Erreur avec l’assistant IA')
+  }
+}
 
 export const getSuggestions = async (ideas = [], model = 'mistralai/mistral-7b-instruct') => {
   const prompt = `Voici des idées actuelles :\n${ideas.map(i => `- ${i.text}`).join('\n')}\n\nPropose 3 idées complémentaires ou originales en lien avec celles-ci.`
