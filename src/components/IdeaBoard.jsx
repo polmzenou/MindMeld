@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
 import IdeaCard from './IdeaCard'
 import { getSuggestions } from '../services/openrouter'
 import { saveAs } from 'file-saver'
@@ -13,7 +13,7 @@ const MODELS = [
   { label: "Zephyr 7B (HuggingFace)", value: "huggingfaceh4/zephyr-7b-beta:free" },
 ]
 
-function IdeaBoard() {
+const IdeaBoard = forwardRef(({ onSaveSession }, ref) => {
   const [ideas, setIdeas] = useState([])
   const [newIdea, setNewIdea] = useState('')
   const [loading, setLoading] = useState(false)
@@ -28,6 +28,10 @@ function IdeaBoard() {
   const [timeLeft, setTimeLeft] = useState(15 * 60)
   const [focusDuration, setFocusDuration] = useState(15 * 60)
   const [ideasDuringFocus, setIdeasDuringFocus] = useState(0)
+
+  useImperativeHandle(ref, () => ({
+    setIdeas,
+  }))
 
   useEffect(() => {
     const saved = localStorage.getItem('mindmeld_model')
@@ -76,7 +80,8 @@ function IdeaBoard() {
 
   const addIdea = (text = newIdea) => {
     if (text.trim() === '') return
-    setIdeas([...ideas, { id: Date.now(), text }])
+    const newEntry = { id: Date.now(), text }
+    setIdeas([...ideas, newEntry])
     if (focusMode) setIdeasDuringFocus(prev => prev + 1)
     setNewIdea('')
   }
@@ -163,6 +168,14 @@ function IdeaBoard() {
 
   return (
     <div className="p-4 text-light-text dark:text-dark-text">
+      <div className="flex justify-end mb-2">
+        <button
+          onClick={() => onSaveSession(ideas)}
+          className="bg-blue-600 text-white px-4 py-2 rounded"
+        >
+          💾 Sauvegarder
+        </button>
+      </div>
       <div className="flex items-center justify-between mb-4">
         <div className="text-sm text-gray-700 dark:text-gray-300">
           ⏱️ Mode Focus : {focusMode ? formatTime(timeLeft) : 'inactif'}
@@ -287,6 +300,6 @@ function IdeaBoard() {
       </div>
     </div>
   )
-}
+})
 
 export default IdeaBoard
